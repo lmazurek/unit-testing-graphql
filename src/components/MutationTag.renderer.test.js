@@ -25,7 +25,7 @@ const mocks = [
   {
     request: {
       query: GET_GUIDES,
-      variables: { name: "guide guide" }
+      variables: {}
     },
     result: {
       data: {
@@ -45,12 +45,11 @@ it("should render without error", () => {
 })
 
 it("should call a mutation after submitting name", async () => {
-  const component = render(
+  const { getByTestId, getByText, debug } = render(
     <MockedProvider mocks={mocks} addTypename={false}>
       <MutationTag />
     </MockedProvider>
   )
-  const { getByTestId } = component
 
   fireEvent.change(getByTestId("guide_name_input"), {
     target: { value: "guide guide" }
@@ -60,6 +59,5 @@ it("should call a mutation after submitting name", async () => {
 
   await wait(0)
 
-  const tree = component.toJSON()
-  expect(tree.children).toContain("Deleted!")
+  expect(getByText(/created!/i)).toBeInTheDocument()
 })
