@@ -34,22 +34,23 @@ const mocks = [
     }
   }
 ]
+let component;
 
-it("should render without error", () => {
-  const { container } = render(
+beforeEach(() => {
+  component = render(
     <MockedProvider mocks={mocks} addTypename={false}>
       <MutationTag />
     </MockedProvider>
   )
+})
+
+it("should render without error", () => {
+  const { container } = component
   expect(container).toBeInTheDocument()
 })
 
 it("should call a mutation after submitting name", async () => {
-  const { getByTestId, getByText, debug } = render(
-    <MockedProvider mocks={mocks} addTypename={false}>
-      <MutationTag />
-    </MockedProvider>
-  )
+  const { getByTestId, getByText, debug } = component
 
   fireEvent.change(getByTestId("guide_name_input"), {
     target: { value: "guide guide" }
