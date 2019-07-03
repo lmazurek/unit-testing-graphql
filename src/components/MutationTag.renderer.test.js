@@ -1,12 +1,12 @@
 import React from "react"
-import wait from 'waait'
 import "jest-dom/extend-expect"
 import "@testing-library/react/cleanup-after-each"
-import { render, fireEvent } from "@testing-library/react"
+import { render, fireEvent, wait } from "@testing-library/react"
 import { MockedProvider } from "react-apollo/test-utils"
 import { CREATE_GUIDE, MutationTag, GET_GUIDES } from "./MutationTag"
 
 const createGuide = jest.fn()
+const onSubmitCallback = jest.fn()
 
 const mocks = [
   {
@@ -39,10 +39,11 @@ let component;
 beforeEach(() => {
   component = render(
     <MockedProvider mocks={mocks} addTypename={false}>
-      <MutationTag />
+      <MutationTag onSubmitCallback={onSubmitCallback} />
     </MockedProvider>
   )
 })
+
 
 it("should render without error", () => {
   const { container } = component
@@ -58,7 +59,19 @@ it("should call a mutation after submitting name", async () => {
 
   fireEvent.submit(getByTestId("form"))
 
-  await wait(0)
+  expect(onSubmitCallback).toHaveBeenCalledTimes(1)
 
-  expect(getByText(/created!/i)).toBeInTheDocument()
+  await wait(() => expect(getByText(/created!/i)).toBeInTheDocument())
+})
+
+it("should call onSubmitCallback on submit", async () => {
+  const { getByTestId, getByText, debug } = component
+
+  fireEvent.change(getByTestId("guide_name_input"), {
+    target: { value: "guide guide" }
+  })
+
+  fireEvent.submit(getByTestId("form"))
+
+  expect(onSubmitCallback).toHaveBeenCalledTimes(2)
 })

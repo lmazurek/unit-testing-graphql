@@ -27,7 +27,7 @@ export const GET_GUIDES = gql`
   }
 `
 
-const MutationTag = () => {
+const MutationTag = ({ onSubmitCallback }) => {
   let input
   return (
     <Mutation
@@ -48,6 +48,7 @@ const MutationTag = () => {
                 e.preventDefault()
                 createGuide({ variables: { name: input.value } })
                 input.value = ""
+                onSubmitCallback();
               }}
             >
               <h4>Mutation</h4>
@@ -98,7 +99,7 @@ const GuidesList = () => (
 
 const MutationTagExample = () => (
   <ApolloProvider client={client}>
-    <MutationTag />
+    <MutationTag onSubmitCallback={() => alert('foo')} />
     <GuidesList />
   </ApolloProvider>
 )
