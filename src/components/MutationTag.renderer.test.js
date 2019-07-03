@@ -1,9 +1,12 @@
 import React from "react"
+import wait from 'waait'
 import "jest-dom/extend-expect"
 import "@testing-library/react/cleanup-after-each"
 import { render, fireEvent } from "@testing-library/react"
 import { MockedProvider } from "react-apollo/test-utils"
-import { CREATE_GUIDE, MutationTag } from "./MutationTag"
+import { CREATE_GUIDE, MutationTag, GET_GUIDES } from "./MutationTag"
+
+const createGuide = jest.fn()
 
 const mocks = [
   {
@@ -13,7 +16,20 @@ const mocks = [
     },
     result: {
       data: {
-        guide: { id: "1", name: "guide guide" }
+        createGuide: {
+          guide: { id: "1", name: "guide guide" }
+        }
+      }
+    }
+  },
+  {
+    request: {
+      query: GET_GUIDES,
+      variables: { name: "guide guide" }
+    },
+    result: {
+      data: {
+        guides: { id: "1", name: "guide guide" }
       }
     }
   }
@@ -28,16 +44,22 @@ it("should render without error", () => {
   expect(container).toBeInTheDocument()
 })
 
-it("should call a mutation after submitting name", () => {
-  const { getByTestId } = render(
+it("should call a mutation after submitting name", async () => {
+  const component = render(
     <MockedProvider mocks={mocks} addTypename={false}>
       <MutationTag />
     </MockedProvider>
   )
+  const { getByTestId } = component
 
   fireEvent.change(getByTestId("guide_name_input"), {
     target: { value: "guide guide" }
   })
 
-  fireEvent.click(getByTestId("create_guide_submit"))
+  fireEvent.submit(getByTestId("form"))
+
+  await wait(0)
+
+  const tree = component.toJSON()
+  expect(tree.children).toContain("Deleted!")
 })

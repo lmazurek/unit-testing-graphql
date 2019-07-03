@@ -30,11 +30,20 @@ export const GET_GUIDES = gql`
 const MutationTag = () => {
   let input
   return (
-    <Mutation mutation={CREATE_GUIDE}>
+    <Mutation
+      mutation={CREATE_GUIDE}
+      refetchQueries={[
+        {
+          query: GET_GUIDES
+        }
+      ]}
+    >
       {(createGuide, { data }) => {
+        if (data) return <p>Created!</p>
         return (
           <div>
             <form
+              data-testid="form"
               onSubmit={e => {
                 e.preventDefault()
                 createGuide({ variables: { name: input.value } })
@@ -49,9 +58,7 @@ const MutationTag = () => {
                   }}
                   data-testid="guide_name_input"
                 />
-                <button type="submit" data-testid="create_guide_submit">
-                  Create guide
-                </button>
+                <button type="submit">Create guide</button>
               </div>
             </form>
           </div>
@@ -78,12 +85,12 @@ const GuidesList = () => (
       if (loading) return "Loading…"
       if (error) return `Error! ${error.message}`
       return (
-        <>
+        <div data-testid="list">
           <h4>Query tag + delete mutation</h4>
           {guides.map(guide => (
             <Guide guide={guide} key={guide.id} />
           ))}
-        </>
+        </div>
       )
     }}
   </Query>
